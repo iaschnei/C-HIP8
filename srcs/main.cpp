@@ -1,6 +1,16 @@
 #include <stack>
 #include <stdint.h>
-#include "raylib.h"
+#include <iostream>
+
+#include <cstdlib>
+#include <unistd.h>
+
+#include "SDL2/SDL.h"
+
+const int SCREEN_W = 640;
+const int SCREEN_H = 320;
+
+// ------------------------------------------------------------------------------------------------
 
 typedef struct s_components {
 
@@ -16,47 +26,83 @@ typedef struct s_components {
 
 	uint8_t		memory[4096];				// RAM available (4Kb)
 
-	uint8_t		screen[32][64];				// Display (can only be 1 or 0, on or off)
+	uint8_t		screen[64][32];				// Display (can only be 1 or 0, on or off)
 
-}   t_components;
+}	t_components;
+
+// ------------------------------------------------------------------------------------------------
 
 int main (int ac, char **av) {
 
-	(void) ac;
+	if (ac != 2) {
+		std::cerr << "Please input a ROM file." << std::endl;
+	}
+
 	(void) av;
+
+	// --- SDL initialisation ---
+
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		std::cerr << "SDL_Init failure." << std::endl << SDL_GetError() << std::endl;
+		return (1);
+	}
+
+	SDL_Window *window = SDL_CreateWindow( "C-HIP 8",
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+		SCREEN_W, SCREEN_H, 0
+	);
+
+	if (!window) {
+		std::cerr << "SDL_CreateWindow failure." << std::endl << SDL_GetError() << std::endl;
+		SDL_Quit();
+		return (2);
+	}
+
+	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+
+	if (!renderer) {
+		std::cerr << "SDL_CreateRenderer failure." << std::endl << SDL_GetError() << std::endl;
+		SDL_Quit();
+		return (3);
+	}
+
+	// Should not fail according to documentation, unless some params are wrong
+	SDL_Texture *texture = SDL_CreateTexture(renderer,
+		SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING,
+		64, 32
+	);
 	
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 640;
-    const int screenHeight = 320;
+	// --------------------------
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+	uint32_t pixels[2048];
+	int		row = 4;
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+	while (true) {
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
 
-        // Draw
-        //----------------------------------------------------------------------------------
-        BeginDrawing();
+			if (event.type == SDL_QUIT) {
+				SDL_Quit();
+				return (0);
+			}
+		}
 
-            ClearBackground(BLACK); // other color is RAYWHITE
+		SDL_LockTexture(texture, NULL,(void **) &pixels, &row); //??
 
-			DrawRectangle(76, 12, 10, 10, RAYWHITE);
+		//update pixels here
+		pixels[rand() % 2048] = 0xff0000;
 
-        EndDrawing();
-        //----------------------------------------------------------------------------------
-    }
+		SDL_UnlockTexture(texture);
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
+
+		// Clear screen and render
+		SDL_RenderClear(renderer);
+		SDL_RenderCopy(renderer, texture, NULL, NULL);
+		SDL_RenderPresent(renderer);
+	}
+
+	SDL_Quit();
+	return (0);
 }

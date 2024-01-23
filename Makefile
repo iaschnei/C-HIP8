@@ -12,7 +12,7 @@ C++			=	c++
 
 INCL    	=	includes
 
-FLAGS		=	-Wall -Wextra -Werror -MMD -MP -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+FLAGS		=	-Wall -Wextra -Werror -MMD -MP  $(shell pkg-config --cflags --libs sdl2)
 
 NAME		=	c-hip8
 
