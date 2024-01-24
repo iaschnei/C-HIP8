@@ -68,16 +68,12 @@ int main (int ac, char **av) {
 
 	// Should not fail according to documentation, unless some params are wrong
 	SDL_Texture *texture = SDL_CreateTexture(renderer,
-		SDL_PIXELFORMAT_ARGB8888,
-		SDL_TEXTUREACCESS_STREAMING,
+		SDL_PIXELFORMAT_RGBA8888,
+		SDL_TEXTUREACCESS_TARGET,
 		64, 32
 	);
 	
 	// --------------------------
-
-	uint32_t pixels[2048];
-	int		row = 4;
-
 	while (true) {
 
 		SDL_Event event;
@@ -89,18 +85,18 @@ int main (int ac, char **av) {
 			}
 		}
 
-		SDL_LockTexture(texture, NULL,(void **) &pixels, &row); //??
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); 	//Set color to white
 
-		//update pixels here
-		pixels[rand() % 2048] = 0xff0000;
+		SDL_SetRenderTarget(renderer, texture);					//Render target is texture now
 
-		SDL_UnlockTexture(texture);
+		SDL_RenderDrawPoint(renderer, 10, 10);					//Draw a point on render target -> texture here
 
+		SDL_SetRenderTarget(renderer, NULL);					//Render tarfet is window now (NULL)
 
-		// Clear screen and render
-		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, texture, NULL, NULL);
-		SDL_RenderPresent(renderer);
+		SDL_RenderCopy(renderer, texture, NULL, NULL);			//Copy whole texture to render target -> window here
+		SDL_RenderPresent(renderer);							//Update render
+
+		sleep(1);
 	}
 
 	SDL_Quit();
