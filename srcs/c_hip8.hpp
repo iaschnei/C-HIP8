@@ -5,13 +5,31 @@
 # include <stdint.h>
 # include <iostream>
 # include <unistd.h>
+# include <cstring>
+# include <istream>
+# include <fstream>
 # include "SDL2/SDL.h"
+
+# define HI_NIBBLE(b) (((b) >> 4) & 0x0F)
+# define LO_NIBBLE(b) ((b) & 0x0F)
+
+# define OFF_COL_R 31
+# define OFF_COL_G 32
+# define OFF_COL_B 34
+
+# define ON_COL_R 251
+# define ON_COL_G 250
+# define ON_COL_B 245
 
 const int SCREEN_W = 640;
 const int SCREEN_H = 320;
 
-const int OPERATION_PER_SEC = 700;
+const int RESOL_W = 64;
+const int RESOL_H = 32;
+
+const int OPERATION_PER_SEC = 660;
 const int OPERATION_TICK = 1000 / OPERATION_PER_SEC;
+const int DELAYRATE = 60;
 
 // ------------------------------------------------------------------------------------------------
 
@@ -29,7 +47,7 @@ typedef struct s_components {
 
 	uint8_t		memory[4096];				// RAM available (4Kb)
 
-	uint8_t		to_change[2048];			// Will be used as a buffer for changes on display (64x32)
+	uint8_t		display[2048];				// Will be used as a buffer for changes on display (64x32)
 
 }	t_components;
 
@@ -43,8 +61,15 @@ typedef struct s_sdl_data {
 
 // ------------------------------------------------------------------------------------------------
 
-// ----------- Graphics :
-int initalise_SDL(t_sdl_data *sdl_data);
-int displayTest(t_sdl_data *sdl_data);
+// ----------- Initialisation (except SDL) :
+int 	initialise_memory(t_components *components, char *av1);
+void	initialise_font(t_components *components);
+int 	initalise_SDL(t_sdl_data *sdl_data);
+int 	load_rom(t_components *components, char *av1);
+
+
+// ----------- Operations :
+int 	handle_operation(t_components *components, t_sdl_data *sdl_data);
+void 	update_display(t_components *components, t_sdl_data *sdl_data);
 
 #endif

@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------- #
 
-SRCS		=	srcs/main.cpp srcs/graphics.cpp
+SRCS		=	srcs/main.cpp srcs/initialisation.cpp srcs/operations.cpp
 
 # ---------------------------------------------------------------------------- #
 
