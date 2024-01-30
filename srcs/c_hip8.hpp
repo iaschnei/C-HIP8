@@ -32,6 +32,8 @@ const int OPERATION_TICK = 1000 / OPERATION_PER_SEC;
 const int DELAYRATE = 60;
 
 // ------------------------------------------------------------------------------------------------
+// Since there is a limited amount of variables to keep track off, creating classes felt like an overkill on this one
+// So I kept it to C-style structs !
 
 typedef struct s_components {
 

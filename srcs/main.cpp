@@ -23,6 +23,13 @@ int main (int ac, char **av) {
 
 	int timer_count = 0;
 
+	// Main program loop, will run OPERATION_PER_SEC times / sec
+	// Check SDL_events then handle one operation at a time
+	// Decrease timers if necessary then wait
+	//  - Since handling an operation for such a simple system is almost instantaneous, usleep-ing is fine
+	//  - It won't be extremely precise and execution speed could theoretically vary
+	//	- Ultimately, it's a tradeoff between accuracy and code simplicity/readability
+
 	while (true) {
 
 		SDL_Event event;

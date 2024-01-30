@@ -24,7 +24,7 @@ int initialise_memory(t_components *components, char *av1) {
 	return (1);
 }
 
-// Store default font in memory from 0x050 to 0x09F
+// Store default font in memory from 0x050 to 0x09F (could be anywhere between 0 and 0x200)
 void	initialise_font(t_components *components) {
 
 	uint8_t	font[80] =
@@ -52,6 +52,7 @@ void	initialise_font(t_components *components) {
 	}
 }
 
+// Load rom data into memory, starting at 0x200
 int load_rom(t_components *components, char *av1) {
 
 	std::ifstream fs;
@@ -73,7 +74,7 @@ int load_rom(t_components *components, char *av1) {
 		return (0);
 	}
 
-	for (int i = 0; i < length; i++) {
+	for (int i = 0; i < length && i + 0x200 < 4096; i++) {
 		components->memory[i + 0x200] = (uint8_t)buffer[i];
 	}
 
@@ -83,6 +84,7 @@ int load_rom(t_components *components, char *av1) {
 	return (1);
 }
 
+// Create all components required by SDL to render on screen
 int initalise_SDL(t_sdl_data *sdl_data) {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {

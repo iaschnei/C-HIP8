@@ -7,6 +7,13 @@ static void op_add_to_vx(t_components *components, uint8_t nib1, uint8_t nib2, u
 static void op_set_index(t_components *components, uint8_t nib1, uint8_t nib2, uint8_t nib3);
 static void op_draw(t_components *components, t_sdl_data *sdl_data ,uint8_t nib1, uint8_t nib2, uint8_t nib3);
 
+
+/*	
+**	Probably the most important part of the program.
+**	It will read the next operation in memory, pointed to by the program counter.
+**	This instruction (2 bytes) will be divided in 4 nibbles. The nibbles determine which instruction to execute.
+** 	Return 0 if the instruction is unknown, should never happen unless with homemade roms with errors
+*/
 int handle_operation(t_components *components, t_sdl_data *sdl_data) {
 
     uint8_t nibbles[4];
@@ -43,12 +50,10 @@ int handle_operation(t_components *components, t_sdl_data *sdl_data) {
 			break;
 
 		case 0x6:
-			//more to add ?
 			op_set_vx(components, nibbles[1], nibbles[2], nibbles[3]);
 			break;
 		
 		case 0x7:
-			//more to add ?
 			op_add_to_vx(components, nibbles[1], nibbles[2], nibbles[3]);
 			break;
 
@@ -78,26 +83,32 @@ static void	op_clear_screen(t_sdl_data *sdl_data) {
 	SDL_RenderClear(sdl_data->renderer);
 }
 
+// Set program counter to the specified address
 static void op_jump_to(t_components *components, uint8_t nib1, uint8_t nib2, uint8_t nib3) {
 
 	components->program_counter = (nib1 << 8) | (nib2 << 4) | nib3;
 }
 
+// Set register X to the specified value
 static void op_set_vx(t_components *components, uint8_t nib1, uint8_t nib2, uint8_t nib3) {
 
 	components->registers[nib1] = (nib2 << 4) | nib3;
 }
 
+// Add the specified value to register X
 static void op_add_to_vx(t_components *components, uint8_t nib1, uint8_t nib2, uint8_t nib3) {
 
 	components->registers[nib1] += (nib2 << 4) | nib3;
 }
 
+// Set the index register to the specified address
 static void op_set_index(t_components *components, uint8_t nib1, uint8_t nib2, uint8_t nib3) {
 
 	components->index_register = (nib1 << 8) | (nib2 << 4) | nib3;
 }
 
+// Draw a sprite to the screen of height nib3 and at coordinates nib1 nib2
+// The sprite is located at index register in memory
 static void op_draw(t_components *components, t_sdl_data *sdl_data ,uint8_t nib1, uint8_t nib2, uint8_t nib3) {
 
 	uint8_t x_coord = components->registers[nib1] % RESOL_W;
@@ -138,6 +149,7 @@ static void op_draw(t_components *components, t_sdl_data *sdl_data ,uint8_t nib1
 	update_display(components, sdl_data);
 }
 
+// Update the display, switching colors on to off and off to on if necessary
 void update_display(t_components *components, t_sdl_data *sdl_data) {
 
 	SDL_SetRenderTarget(sdl_data->renderer, sdl_data->texture);
@@ -161,19 +173,3 @@ void update_display(t_components *components, t_sdl_data *sdl_data) {
 	SDL_RenderCopy(sdl_data->renderer, sdl_data->texture, NULL, NULL);
 	SDL_RenderPresent(sdl_data->renderer);
 }
-
-// int displayTest(t_sdl_data *sdl_data) {
-
-// 	SDL_SetRenderDrawColor(sdl_data->renderer, 255, 255, 255, 255); 			//Set color to white
-
-// 	SDL_SetRenderTarget(sdl_data->renderer, sdl_data->texture);				//Render target is texture now
-
-// 	SDL_RenderDrawPoint(sdl_data->renderer, 10, 10);							//Draw a point on render target -> texture here
-
-// 	SDL_SetRenderTarget(sdl_data->renderer, NULL);							//Render tarfet is window now (NULL)
-
-// 	SDL_RenderCopy(sdl_data->renderer, sdl_data->texture, NULL, NULL);		//Copy whole texture to render target -> window here
-// 	SDL_RenderPresent(sdl_data->renderer);									//Update render
-
-// 	return (1);
-// }
