@@ -13,5 +13,7 @@ I included a basic rom file in the roms folder but you can find a a lot of them 
 
 # Ressources
 My main source of documentation was this wonderful guide : https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
+
 Complete enough to make it easy to understand, abstract enough to leave the implementation open
+
 I also looked at some repositories of existing projects
