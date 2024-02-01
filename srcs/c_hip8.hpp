@@ -8,6 +8,8 @@
 # include <cstring>
 # include <istream>
 # include <fstream>
+# include <thread>
+# include <chrono>
 # include "SDL2/SDL.h"
 
 # define HI_NIBBLE(b) (((b) >> 4) & 0x0F)
@@ -31,12 +33,32 @@ const int OPERATION_PER_SEC = 660;
 const int OPERATION_TICK = 1000 / OPERATION_PER_SEC;
 const int DELAYRATE = 60;
 
+const uint8_t keymap[16] = {		// Corresponds to the 16 keys to the left of a QWERTY keyboard, but in the original COSMAC VIP order
+    SDLK_x,
+    SDLK_1,
+    SDLK_2,
+    SDLK_3,
+    SDLK_q,
+    SDLK_w,
+    SDLK_e,
+    SDLK_a,
+    SDLK_s,
+    SDLK_d,
+    SDLK_z,
+    SDLK_c,
+    SDLK_4,
+    SDLK_r,
+    SDLK_f,
+    SDLK_v,
+};
+
 // ------------------------------------------------------------------------------------------------
 // Since there is a limited amount of variables to keep track off, creating classes felt like an overkill on this one
 // So I kept it to C-style structs !
 
 typedef struct s_components {
 
+	uint8_t		key_pressed[16];			// Indicates whether one of the 16 keys is pressed or not
 
 	uint8_t		registers[16];				// The registers of the processor
 

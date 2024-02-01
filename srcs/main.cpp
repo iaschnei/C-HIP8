@@ -21,15 +21,6 @@ int main (int ac, char **av) {
 		return (1);
 	}
 
-	int timer_count = 0;
-
-	// Main program loop, will run OPERATION_PER_SEC times / sec
-	// Check SDL_events then handle one operation at a time
-	// Decrease timers if necessary then wait
-	//  - Since handling an operation for such a simple system is almost instantaneous, usleep-ing is fine
-	//  - It won't be extremely precise and execution speed could theoretically vary
-	//	- Ultimately, it's a tradeoff between accuracy and code simplicity/readability
-
 	while (true) {
 
 		SDL_Event event;
@@ -39,6 +30,22 @@ int main (int ac, char **av) {
 				SDL_Quit();
 				return (0);
 			}
+
+			if (event.type == SDL_KEYDOWN) {
+				for (int i = 0; i < 16; ++i) {
+					if (event.key.keysym.sym == keymap[i]) {
+						components.key_pressed[i] = 1;
+					}
+				}
+			}
+
+			if (event.type == SDL_KEYUP) {
+				for (int i = 0; i < 16; ++i) {
+					if (event.key.keysym.sym == keymap[i]) {
+						components.key_pressed[i] = 0;
+					}
+				}
+            }
 		}
 
 		if (!handle_operation(&components, &sdl_data)) {
@@ -46,21 +53,9 @@ int main (int ac, char **av) {
 			return (1);
 		}
 
-		timer_count ++;
-		if (timer_count ==  DELAYRATE) {
-			update_display(&components, &sdl_data);
-			timer_count = 0;
-			components.delay_timer --;
-			if (components.delay_timer == 0) {
-				components.delay_timer = 60;
-			}
-			
-			if (components.sound_timer > 0) {
-				components.sound_timer --;
-			}
-		}
+		update_display(&components, &sdl_data);
 
-		usleep(OPERATION_TICK * 1000);
+		std::this_thread::sleep_for(std::chrono::microseconds(1200));
 	}
 
 	SDL_Quit();
